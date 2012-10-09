@@ -1,0 +1,9 @@
+C:\Users\bcr\Documents\GitHub\Sunflower\bin\Debug\Resources\LawsonFront.png
+C:\Users\bcr\Documents\GitHub\Sunflower\bin\Debug\Poincare.exe
+C:\Users\bcr\Documents\GitHub\Sunflower\bin\Debug\Poincare.pdb
+C:\Users\bcr\Documents\GitHub\Sunflower\bin\Debug\FortuneVoronoi.dll
+C:\Users\bcr\Documents\GitHub\Sunflower\bin\Debug\OpenTK.dll
+C:\Users\bcr\Documents\GitHub\Sunflower\bin\Debug\FortuneVoronoi.pdb
+C:\Users\bcr\Documents\GitHub\Sunflower\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\bcr\Documents\GitHub\Sunflower\obj\x86\Debug\Poincare.exe
+C:\Users\bcr\Documents\GitHub\Sunflower\obj\x86\Debug\Poincare.pdb

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type='text/xsl' href='_UpgradeReport_Files/UpgradeReport.xslt'?><UpgradeLog>
+<Properties><Property Name="Solution" Value="Sunflower">
+</Property><Property Name="Solution File" Value="C:\Users\bcr\Documents\GitHub\Sunflower\Sunflower.sln">
+</Property><Property Name="Date" Value="Tuesday, October 09, 2012">
+</Property><Property Name="Time" Value="8:45:23 AM">
+</Property><Property Name="Log Number" Value="3">
+</Property></Properties><Event ErrorLevel="2" Project="FortuneVoronoi" Source="FortuneVoronoi\FortuneVoronoi.csproj" Description="Error converting project file.  MSB0001: Internal MSBuild Error: Missing resource 'NoAttributesExpected'">
+</Event><Event ErrorLevel="3" Project="FortuneVoronoi" Source="FortuneVoronoi\FortuneVoronoi.csproj" Description="Not Converted">
+</Event><Event ErrorLevel="2" Project="" Source="FortuneVoronoi\FortuneVoronoi.csproj" Description="The operation could not be completed ">
+</Event></UpgradeLog>

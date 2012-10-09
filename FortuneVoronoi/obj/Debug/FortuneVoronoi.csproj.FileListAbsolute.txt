@@ -1,0 +1,5 @@
+C:\Users\bcr\Documents\GitHub\Sunflower\FortuneVoronoi\bin\Debug\FortuneVoronoi.dll
+C:\Users\bcr\Documents\GitHub\Sunflower\FortuneVoronoi\bin\Debug\FortuneVoronoi.pdb
+C:\Users\bcr\Documents\GitHub\Sunflower\FortuneVoronoi\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\bcr\Documents\GitHub\Sunflower\FortuneVoronoi\obj\Debug\FortuneVoronoi.dll
+C:\Users\bcr\Documents\GitHub\Sunflower\FortuneVoronoi\obj\Debug\FortuneVoronoi.pdb

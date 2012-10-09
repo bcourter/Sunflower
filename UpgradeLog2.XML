@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type='text/xsl' href='_UpgradeReport_Files/UpgradeReport.xslt'?><UpgradeLog>
+<Properties><Property Name="Solution" Value="Sunflower">
+</Property><Property Name="Solution File" Value="C:\Users\bcr\Documents\GitHub\Sunflower\Sunflower.sln">
+</Property><Property Name="Date" Value="Tuesday, October 09, 2012">
+</Property><Property Name="Time" Value="8:44 AM">
+</Property><Property Name="Log Number" Value="2">
+</Property></Properties><Event ErrorLevel="0" Project="Poincare" Source="Poincare.csproj" Description="The project file does not require conversion.">
+</Event><Event ErrorLevel="3" Project="Poincare" Source="Poincare.csproj" Description="No Conversion Required">
+</Event><Event ErrorLevel="2" Project="FortuneVoronoi" Source="FortuneVoronoi\FortuneVoronoi.csproj" Description="Error converting project file.  MSB0001: Internal MSBuild Error: Missing resource 'NoAttributesExpected'">
+</Event><Event ErrorLevel="3" Project="FortuneVoronoi" Source="FortuneVoronoi\FortuneVoronoi.csproj" Description="Not Converted">
+</Event><Event ErrorLevel="0" Project="" Source="Sunflower.sln" Description="The solution file does not require conversion.">
+</Event><Event ErrorLevel="3" Project="" Source="Sunflower.sln" Description="No Conversion Required">
+</Event></UpgradeLog>
