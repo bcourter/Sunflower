@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Poincare", "Poincare.csproj", "{158E6F88-3D71-45D7-8F40-EA898EA38C22}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{56C89E4F-846D-4DC9-8F08-66EC806AE51C}"
+	ProjectSection(SolutionItems) = preProject
+		README.txt = README.txt
+		INSTALL.txt = INSTALL.txt
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FortuneVoronoi", "FortuneVoronoi\FortuneVoronoi.csproj", "{2C1793D5-0002-4876-AF53-452B364464C6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{158E6F88-3D71-45D7-8F40-EA898EA38C22}.Debug|x86.ActiveCfg = Debug|x86
+		{158E6F88-3D71-45D7-8F40-EA898EA38C22}.Debug|x86.Build.0 = Debug|x86
+		{158E6F88-3D71-45D7-8F40-EA898EA38C22}.Release|x86.ActiveCfg = Release|x86
+		{158E6F88-3D71-45D7-8F40-EA898EA38C22}.Release|x86.Build.0 = Release|x86
+		{2C1793D5-0002-4876-AF53-452B364464C6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2C1793D5-0002-4876-AF53-452B364464C6}.Debug|x86.Build.0 = Debug|Any CPU
+		{2C1793D5-0002-4876-AF53-452B364464C6}.Release|x86.ActiveCfg = Release|Any CPU
+		{2C1793D5-0002-4876-AF53-452B364464C6}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Poincare.csproj
+		Policies = $0
+		$0.DotNetNamingPolicy = $1
+		$1.DirectoryNamespaceAssociation = None
+		$1.ResourceNamePolicy = FileFormatDefault
+		$0.VersionControlPolicy = $2
+		$2.inheritsSet = Mono
+		$0.ChangeLogPolicy = $3
+		$3.UpdateMode = None
+		$3.MessageStyle = $4
+		$4.LineAlign = 0
+		$3.inheritsSet = Mono
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,9 @@
+D:\Poincare-win\Poincare\bin\Debug\Poincare.exe
+D:\Poincare-win\Poincare\bin\Debug\Poincare.pdb
+D:\Poincare-win\Poincare\bin\Debug\OpenTK.dll
+D:\Poincare-win\Poincare\bin\Debug\OpenTK.xml
+D:\Poincare-win\Poincare\obj\x86\Debug\ResolveAssemblyReference.cache
+D:\Poincare-win\Poincare\obj\x86\Debug\Poincare.exe
+D:\Poincare-win\Poincare\obj\x86\Debug\Poincare.pdb
+D:\Poincare-win\Poincare\bin\Debug\Resources\Default.jpg
+D:\Poincare-win\Poincare\bin\Debug\README.txt

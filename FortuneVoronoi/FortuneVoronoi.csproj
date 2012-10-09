@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<VisualStudioProject ToolsVersion="4.0">
+  <CSHARP ProjectType="Local" ProductVersion="7.10.3077" SchemaVersion="2.0" ProjectGuid="{DDF5D740-6EE1-44BA-9DB9-782BF23E28D6}">
+    <Build>
+      <Settings ApplicationIcon="" AssemblyKeyContainerName="" AssemblyName="FortuneVoronoi" AssemblyOriginatorKeyFile="" DefaultClientScript="JScript" DefaultHTMLPageLayout="Grid" DefaultTargetSchema="IE50" DelaySign="false" OutputType="Library" PreBuildEvent="" PostBuildEvent="" RootNamespace="FortuneVoronoi" RunPostBuildEvent="OnBuildSuccess" StartupObject="">
+        <Config Name="Debug" AllowUnsafeBlocks="false" BaseAddress="285212672" CheckForOverflowUnderflow="false" ConfigurationOverrideFile="" DefineConstants="DEBUG;TRACE" DocumentationFile="" DebugSymbols="true" FileAlignment="4096" IncrementalBuild="false" NoStdLib="false" NoWarn="" Optimize="false" OutputPath="bin\Debug\" RegisterForComInterop="false" RemoveIntegerChecks="false" TreatWarningsAsErrors="false" WarningLevel="4" />
+        <Config Name="Release" AllowUnsafeBlocks="false" BaseAddress="285212672" CheckForOverflowUnderflow="false" ConfigurationOverrideFile="" DefineConstants="TRACE" DocumentationFile="" DebugSymbols="false" FileAlignment="4096" IncrementalBuild="false" NoStdLib="false" NoWarn="" Optimize="true" OutputPath="bin\Release\" RegisterForComInterop="false" RemoveIntegerChecks="false" TreatWarningsAsErrors="false" WarningLevel="4" />
+      </Settings>
+      <References>
+        <Reference Name="System" AssemblyName="System" HintPath="C:\WINNT\Microsoft.NET\Framework\v1.1.4322\System.dll" />
+        <Reference Name="System.Data" AssemblyName="System.Data" HintPath="C:\WINNT\Microsoft.NET\Framework\v1.1.4322\System.Data.dll" />
+        <Reference Name="System.XML" AssemblyName="System.XML" HintPath="C:\WINNT\Microsoft.NET\Framework\v1.1.4322\System.XML.dll" />
+        <Reference Name="System.Drawing" AssemblyName="System.Drawing" HintPath="C:\WINNT\Microsoft.NET\Framework\v1.1.4322\System.Drawing.dll" />
+      </References>
+    </Build>
+    <Files>
+      <Include>
+        <File RelPath="AssemblyInfo.cs" SubType="Code" BuildAction="Compile" />
+        <File RelPath="FortuneVoronoi.cs" SubType="Code" BuildAction="Compile" />
+        <File RelPath="HashSet.cs" SubType="Code" BuildAction="Compile" />
+        <File RelPath="PriorityQueue.cs" SubType="Code" BuildAction="Compile" />
+        <File RelPath="ToolBox.cs" SubType="Code" BuildAction="Compile" />
+        <File RelPath="Vector.cs" SubType="Code" BuildAction="Compile" />
+      </Include>
+    </Files>
+  </CSHARP>
+  <PropertyGroup xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{2C1793D5-0002-4876-AF53-452B364464C6}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>FortuneVoronoi</RootNamespace>
+    <AssemblyName>FortuneVoronoi</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <WarningLevel>4</WarningLevel>
+    <RunWithWarnings>false</RunWithWarnings>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' " xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <WarningLevel>4</WarningLevel>
+    <RunWithWarnings>false</RunWithWarnings>
+  </PropertyGroup>
+  <ItemGroup xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="FortuneVoronoi.cs" />
+    <Compile Include="HashSet.cs" />
+    <Compile Include="PriorityQueue.cs" />
+    <Compile Include="ToolBox.cs" />
+    <Compile Include="Vector.cs" />
+  </ItemGroup>
+  <ItemGroup xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Drawing" />
+  </ItemGroup>
+</VisualStudioProject>

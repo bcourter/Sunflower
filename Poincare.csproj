@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{158E6F88-3D71-45D7-8F40-EA898EA38C22}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Poincare</RootNamespace>
+    <AssemblyName>Poincare</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <ConsolePause>false</ConsolePause>
+    <Commandlineparameters>"../../../vitaminwater"</Commandlineparameters>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <ConsolePause>false</ConsolePause>
+    <Commandlineparameters>"../../../best"</Commandlineparameters>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="OpenTK">
+      <HintPath>lib\OpenTK\OpenTK.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="JoystickControl.cs" />
+    <Compile Include="KeyboardControl.cs" />
+    <Compile Include="MouseControl.cs" />
+    <Compile Include="PoincareWindow.cs" />
+    <Compile Include="Geometry\Accuracy.cs" />
+    <Compile Include="Geometry\CircLine.cs" />
+    <Compile Include="Geometry\Complex.cs" />
+    <Compile Include="Geometry\ComplexCollection.cs" />
+    <Compile Include="Geometry\Extensions.cs" />
+    <Compile Include="Geometry\Interval.cs" />
+    <Compile Include="Geometry\Mobius.cs" />
+    <Compile Include="Geometry\TrimmedCircLine.cs" />
+    <Compile Include="Disc\Disc.cs" />
+    <Compile Include="Disc\Face.cs" />
+    <Compile Include="Disc\FundamentalRegion.cs" />
+    <Compile Include="Disc\TriangleMesh.cs" />
+    <Compile Include="Geometry\Circle.cs" />
+    <Compile Include="Geometry\Line.cs" />
+    <Compile Include="Disc\Edge.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <None Include="Poincare.sh" />
+    <None Include="Resources\LawsonFront.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Geometry\" />
+    <Folder Include="Disc\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="FortuneVoronoi\FortuneVoronoi.csproj">
+      <Project>{2C1793D5-0002-4876-AF53-452B364464C6}</Project>
+      <Name>FortuneVoronoi</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>
