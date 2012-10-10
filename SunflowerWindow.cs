@@ -15,14 +15,11 @@ using OpenTK.Input;
 using BenTools.Data;
 using BenTools.Mathematics;
 using Poincare.Geometry;
-using Poincare.PoincareDisc;
 
 namespace Poincare.Application {
 	public class PoincareWindow : GameWindow {
 		static GraphicsMode graphicsMode;
 		const int windowDefaultSize = 800;
-		Disc disc;
-		Bitmap bitmap;
 		Random random = new Random();
 		double time = System.DateTime.Now.Ticks * 1E-7;
 		double oldTime = System.DateTime.Now.Ticks * 1E-7;
@@ -167,8 +164,8 @@ namespace Poincare.Application {
 				resetTime = time;
 			}
 			
-			if (joystickControl != null)
-				joystickControl.Sample(disc.DrawTime);
+//			if (joystickControl != null)
+//				joystickControl.Sample(disc.DrawTime);
 			
 			mouseControl.Sample();
 
@@ -189,12 +186,12 @@ namespace Poincare.Application {
 
 			int seeds = 3008;
 			Vector[] points = new Vector[seeds];
-			double scale = 4e-3;
+			double scale = 1e0;
 
 			for (int i = 0; i < seeds; i++) {
 			    double theta = (double) (i+1) * Tau / Phi;
-         //       double r = Math.Pow(Math.E, (double) i/seeds * 10);
-                double r = (double) i/10;
+               double r = Math.Pow(Math.E, (double) i/seeds);
+       //         double r = (double) i/10;
 			    double x = r * Math.Cos(theta);
 			    double y = r * Math.Sin(theta);
 			    
@@ -225,16 +222,35 @@ namespace Poincare.Application {
 
                 cells[edge.RightData].Add(edge);
                 
-                Complex pA = new Complex(edge.VVertexA.X * scale, edge.VVertexA.Y * scale);
-                Complex pB = new Complex(edge.VVertexB.X * scale, edge.VVertexB.Y * scale);
-                new TrimmedCircLine(pA, pB).DrawGL(Color4.Blue);
+                Complex pA = new Complex(edge.VVertexA.X , edge.VVertexA.Y );
+                Complex pB = new Complex(edge.VVertexB.X , edge.VVertexB.Y );
+
+				int sampleCount = 9;
+				Complex[] samples = new Complex[sampleCount];
+				samples[0] = pA;
+				samples[sampleCount - 1] = pB;
+				for (int i = 1; i < sampleCount - 1; i++) {
+					double ratio = (double) i / sampleCount;
+					samples[i] = pA * (1-ratio) + pB * ratio;
+				}
+
+				samples = samples.Select(p => Complex.CreatePolar(Math.Sqrt(Math.Log(Math.Max(p.Modulus, 1))) * scale, p.Argument)).ToArray();
+
+				for (int i = 1; i < sampleCount; i++) {
+					if (samples[i-1] != Complex.Zero && samples[i] != Complex.Zero)
+						new TrimmedCircLine(samples[i-1], samples[i]).DrawGL(Color4.Blue);
+				}
+
             }
 
             foreach (Vector vector in cells.Keys) {
                 double average = cells[vector].Average(edge => Vector.Dist(edge.VVertexA, edge.VVertexB));
                 float stDev = (float) cells[vector].Sum(edge => Math.Pow(Vector.Dist(edge.VVertexA, edge.VVertexB) - average, 2))/cells[vector].Count;
 
-                new Complex(vector.X * scale, vector.Y * scale).DrawGL(new Color4(stDev, 1-stDev, 0, 1));
+				Complex c = new Complex(vector.X, vector.Y);
+				c = Complex.CreatePolar(Math.Sqrt(Math.Log(c.Modulus)) * scale, c.Argument);
+		//		c *= scale;
+                c.DrawGL(new Color4(stDev, 1-stDev, 0, 1));
             }
 
 			//PolarDemo(time);

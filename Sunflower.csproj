@@ -71,13 +71,8 @@
     <Compile Include="Geometry\Interval.cs" />
     <Compile Include="Geometry\Mobius.cs" />
     <Compile Include="Geometry\TrimmedCircLine.cs" />
-    <Compile Include="Disc\Disc.cs" />
-    <Compile Include="Disc\Face.cs" />
-    <Compile Include="Disc\FundamentalRegion.cs" />
-    <Compile Include="Disc\TriangleMesh.cs" />
     <Compile Include="Geometry\Circle.cs" />
     <Compile Include="Geometry\Line.cs" />
-    <Compile Include="Disc\Edge.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
