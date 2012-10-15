@@ -30,6 +30,7 @@ namespace Poincare.Application {
 		MouseControl mouseControl = null;
 		int p = 5, q = 5 ;
 		int imageIndex = 0;
+		List<double> stern = new List<double>();
 
 		public Complex Offset { get; set; }
 
@@ -61,6 +62,24 @@ namespace Poincare.Application {
 			ImageSpeed = 0.04;
 			ImageOffset = 0;
 			IsInverting = false;
+
+			stern.Add(1);
+			List<double> lastRow = new List<double>();
+			lastRow.Add(1);
+			for (int i = 1; i < 12; i++) {
+				int size = (int) Math.Pow(2, i-1);
+				List<double> firstHalf = new List<double>(size);
+				List<double> secondHalf = new List<double>(size);
+				for (int j = 0; j < size; j++) {
+					firstHalf.Add(lastRow[j]);
+					secondHalf.Add(lastRow[j] + lastRow[size - j - 1]);
+				}
+
+				lastRow = firstHalf;
+				lastRow.AddRange(secondHalf);
+				stern.AddRange(lastRow);
+			}
+
 		}
 
 		/// <summary>Load resources here.</summary>
@@ -184,20 +203,21 @@ namespace Poincare.Application {
 			double Phi = (Math.Sqrt(5) + 1) / 2;
 			double Tau = Math.PI * 2;
 
-			int seeds = 3008;
+			int seeds = 1008;
 			Vector[] points = new Vector[seeds];
-			double scale = 1e0;
+			double scale = 3e-1;
 
 			for (int i = 0; i < seeds; i++) {
 			    double theta = (double) (i+1) * Tau / Phi;
-               double r = Math.Pow(Math.E, (double) i/seeds);
-       //         double r = (double) i/10;
-			    double x = r * Math.Cos(theta);
-			    double y = r * Math.Sin(theta);
+              double r = Math.Pow(Math.E, (double) i/seeds);
+             //   double r = Math.Sqrt( i);
+			    double x = (r) * Math.Cos(theta);
+			    double y = (r) * Math.Sin(theta);
 			    
 				points[i] = new Vector(new double[] {x, y});
 
-				//new Complex(x*scale, y*scale).DrawGL(Color4.Crimson);
+			//	new Complex(x*scale, y*scale).DrawGL(new Color4((float)(i % 2), (float)(i % 3) / 2, (float)(i % 5) / 4, 1));
+				new Complex(x*scale, y*scale).DrawGL(new Color4((float)(stern[i] % 2), (float)(stern[i] % 3) / 2, 0, 1));
 			}
 
 			VoronoiGraph graph = Fortune.ComputeVoronoiGraph(points);
@@ -234,7 +254,8 @@ namespace Poincare.Application {
 					samples[i] = pA * (1-ratio) + pB * ratio;
 				}
 
-				samples = samples.Select(p => Complex.CreatePolar(Math.Sqrt(Math.Log(Math.Max(p.Modulus, 1))) * scale, p.Argument)).ToArray();
+		//		samples = samples.Select(p => Complex.CreatePolar(Math.Sqrt(Math.Log(Math.Max(p.Modulus, 1))) * scale, p.Argument)).ToArray();
+				samples = samples.Select(p => p * scale).ToArray();
 
 				for (int i = 1; i < sampleCount; i++) {
 					if (samples[i-1] != Complex.Zero && samples[i] != Complex.Zero)
@@ -243,15 +264,15 @@ namespace Poincare.Application {
 
             }
 
-            foreach (Vector vector in cells.Keys) {
-                double average = cells[vector].Average(edge => Vector.Dist(edge.VVertexA, edge.VVertexB));
-                float stDev = (float) cells[vector].Sum(edge => Math.Pow(Vector.Dist(edge.VVertexA, edge.VVertexB) - average, 2))/cells[vector].Count;
-
-				Complex c = new Complex(vector.X, vector.Y);
-				c = Complex.CreatePolar(Math.Sqrt(Math.Log(c.Modulus)) * scale, c.Argument);
-		//		c *= scale;
-                c.DrawGL(new Color4(stDev, 1-stDev, 0, 1));
-            }
+//            foreach (Vector vector in cells.Keys) {
+//                double average = cells[vector].Average(edge => Vector.Dist(edge.VVertexA, edge.VVertexB));
+//                float stDev = (float) cells[vector].Sum(edge => Math.Pow(Vector.Dist(edge.VVertexA, edge.VVertexB) - average, 2))/cells[vector].Count;
+//
+//				Complex c = new Complex(vector.X, vector.Y);
+//				c = Complex.CreatePolar(Math.Sqrt(Math.Log(c.Modulus)) * scale, c.Argument);
+//		//		c *= scale;
+//                c.DrawGL(new Color4(stDev, 1-stDev, 0, 1));
+//            }
 
 			//PolarDemo(time);
 			//	LoopDemo(mousePos.Re);
