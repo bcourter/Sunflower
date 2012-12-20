@@ -21,12 +21,12 @@ namespace Poincare.Application {
 		static GraphicsMode graphicsMode;
 		const int windowDefaultSize = 800;
 		Random random = new Random();
-		double time = System.DateTime.Now.Ticks * 1E-7;
-		double oldTime = System.DateTime.Now.Ticks * 1E-7;
-		double startTime = System.DateTime.Now.Ticks * 1E-7;
+		double time = System.DateTime.Now.Ticks / TimeSpan.TicksPerMinute;
+		double oldTime = System.DateTime.Now.Ticks / TimeSpan.TicksPerMinute;
+		double startTime = System.DateTime.Now.Ticks / TimeSpan.TicksPerMinute;
 		double resetTime = 0;
 		double resetDuration = 60;
-		JoystickControl joystickControl = null;
+//		JoystickControl joystickControl = null;
 		MouseControl mouseControl = null;
 		int p = 5, q = 5 ;
 		int imageIndex = 0;
@@ -90,24 +90,12 @@ namespace Poincare.Application {
 			new KeyboardControl(this);
 			mouseControl = new MouseControl(this);
 			
-			if (Joysticks.Count == 1)
-				joystickControl = new JoystickControl(Joysticks[0], this);
+//			if (Joysticks.Count == 1)
+//				joystickControl = new JoystickControl(Joysticks[0], this);
 			
 			Reset(P, Q, imageIndex);
 		}
 
-		public void MakeLimitRotation() {
-			AngleOffset = Offset.Modulus * 2;
-		}
-
-		public void Randomize() {
-			P = random.Next(5) + 3;
-			Q = random.Next(10 - P);
-			imageIndex = random.Next(ImageFiles.Count);
-			
-			Reset();
-		}
-		
 		public void ToggleFullscreen() {
 			if (WindowState == WindowState.Fullscreen) {
 				WindowState = WindowState.Normal;
@@ -175,11 +163,11 @@ namespace Poincare.Application {
 			base.OnRenderFrame(e);
 			
 			oldTime = time;
-			time = System.DateTime.Now.Ticks * 1E-7;
+			time = (double)System.DateTime.Now.Ticks / TimeSpan.TicksPerSecond;
 //			Console.WriteLine(string.Format("Frame:{0:F5} Avg:{1:F5}", time - oldTime, (time - startTime) / ++drawCount));
 			
 			if (IsRandomizing && time - resetTime > resetDuration) {
-				Randomize();
+	//			Randomize();
 				resetTime = time;
 			}
 			
@@ -203,34 +191,38 @@ namespace Poincare.Application {
 			double Phi = (Math.Sqrt(5) + 1) / 2;
 			double Tau = Math.PI * 2;
 
-			int seeds = 1008;
-			Vector[] points = new Vector[seeds];
-			double scale = 3e-1;
+			int seeds = 1024;
+			int extraSeeds = 256;
+			Vector[] points = new Vector[seeds + extraSeeds];
+			double scale = 3e-2;
 
-			for (int i = 0; i < seeds; i++) {
+			for (int i = 0; i < seeds + extraSeeds; i++) {
 			    double theta = (double) (i+1) * Tau / Phi;
-              double r = Math.Pow(Math.E, (double) i/seeds);
-             //   double r = Math.Sqrt( i);
+            //  double r = Math.Pow(Math.E, (double) i/seeds);
+                double r = Math.Sqrt( i);
 			    double x = (r) * Math.Cos(theta);
 			    double y = (r) * Math.Sin(theta);
 			    
 				points[i] = new Vector(new double[] {x, y});
 
 			//	new Complex(x*scale, y*scale).DrawGL(new Color4((float)(i % 2), (float)(i % 3) / 2, (float)(i % 5) / 4, 1));
-				new Complex(x*scale, y*scale).DrawGL(new Color4((float)(stern[i] % 2), (float)(stern[i] % 3) / 2, 0, 1));
+			//	new Complex(x*scale, y*scale).DrawGL(new Color4((float)(i % 4), (float)((i/4) % 4), (float)((i/16) % 4), 1));
+			//	new Complex(x*scale, y*scale).DrawGL(new Color4((float)(i % 2), (float)((i/2) % 2), (float)((i/4) % 2), 1));
+		
+			//	var color = new Color4((float)(i % 2), (float)(i % 3), (float)(i % 5), 1);
+			//	new Complex(x*scale, y*scale).DrawGL(color);
 			}
 
 			VoronoiGraph graph = Fortune.ComputeVoronoiGraph(points);
 
-            Dictionary<Vector, List<VoronoiEdge>> cells = new Dictionary<Vector, List<VoronoiEdge>>();
+            var cells = new SortedDictionary<Vector, List<VoronoiEdge>>();
             foreach (VoronoiEdge edge in graph.Edges) {
-                if (
-                    double.IsNaN(edge.VVertexA.X) ||
+                if (double.IsNaN(edge.VVertexA.X) ||
                     double.IsNaN(edge.VVertexA.Y) ||
                     double.IsNaN(edge.VVertexB.X) ||
                     double.IsNaN(edge.VVertexB.Y)
-                    )
-                continue;
+				)
+					continue;
 
                 if (!cells.ContainsKey(edge.LeftData))
                     cells[edge.LeftData] = new List<VoronoiEdge>();
@@ -242,10 +234,10 @@ namespace Poincare.Application {
 
                 cells[edge.RightData].Add(edge);
                 
-                Complex pA = new Complex(edge.VVertexA.X , edge.VVertexA.Y );
-                Complex pB = new Complex(edge.VVertexB.X , edge.VVertexB.Y );
+                Complex pA = new Complex(edge.VVertexA.X , edge.VVertexA.Y);
+                Complex pB = new Complex(edge.VVertexB.X , edge.VVertexB.Y);
 
-				int sampleCount = 9;
+				int sampleCount = 2;
 				Complex[] samples = new Complex[sampleCount];
 				samples[0] = pA;
 				samples[sampleCount - 1] = pB;
@@ -257,13 +249,32 @@ namespace Poincare.Application {
 		//		samples = samples.Select(p => Complex.CreatePolar(Math.Sqrt(Math.Log(Math.Max(p.Modulus, 1))) * scale, p.Argument)).ToArray();
 				samples = samples.Select(p => p * scale).ToArray();
 
-				for (int i = 1; i < sampleCount; i++) {
-					if (samples[i-1] != Complex.Zero && samples[i] != Complex.Zero)
-						new TrimmedCircLine(samples[i-1], samples[i]).DrawGL(Color4.Blue);
-				}
-
+		//		cells = cells.OrderBy(v => v.Key.SquaredLength).ToDictionary();
+		//		for (int i = 1; i < sampleCount; i++) {
+		//			if (samples[i-1] != Complex.Zero && samples[i] != Complex.Zero)
+		//				new TrimmedCircLine(samples[i-1], samples[i]).DrawGL(Color4.Blue);
+		//		}
             }
+				
+			int modR = 3;
+			int modG = 5;
+			int modB = 8;
+			for (int i = 0; i < seeds; i++) {
+				var color = new Color4(
+					((i+((int)time) % modR) == 0)?1f:0f,
+					(i % modG == ((int)time) % modG)?1f:0f,
+					(i % modB == ((int)time) % modB)?1f:0f,
+					1f);
 
+				Vector v = cells.Keys.ElementAt(i);
+				new Complex(v.X * scale, v.Y * scale).DrawGL(color);
+
+				foreach (VoronoiEdge edge in cells.Values.ElementAt(i)){
+					Complex pA = new Complex(edge.VVertexA.X * scale, edge.VVertexA.Y * scale);
+					Complex pB = new Complex(edge.VVertexB.X * scale, edge.VVertexB.Y * scale);
+					new TrimmedCircLine(pA, pB).DrawGL(Color4.Gray);
+				}
+			}
 //            foreach (Vector vector in cells.Keys) {
 //                double average = cells[vector].Average(edge => Vector.Dist(edge.VVertexA, edge.VVertexB));
 //                float stDev = (float) cells[vector].Sum(edge => Math.Pow(Vector.Dist(edge.VVertexA, edge.VVertexB) - average, 2))/cells[vector].Count;
