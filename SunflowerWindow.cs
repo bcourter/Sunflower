@@ -261,20 +261,61 @@ namespace Poincare.Application {
 			int modB = 8;
 			for (int i = 0; i < seeds; i++) {
 				var color = new Color4(
-					((i+((int)time) % modR) == 0)?1f:0f,
-					(i % modG == ((int)time) % modG)?1f:0f,
-					(i % modB == ((int)time) % modB)?1f:0f,
+					(((i+(int)time*22) % modR) == 0)?1f:0f,
+					(((i+(int)time*22) % modG) == 0)?1f:0f,
+					(((i+(int)time*22) % modB) == 0)?1f:0f,
 					1f);
 
 				Vector v = cells.Keys.ElementAt(i);
+
 				new Complex(v.X * scale, v.Y * scale).DrawGL(color);
 
-				foreach (VoronoiEdge edge in cells.Values.ElementAt(i)){
+				Queue<VoronoiEdge> edges =new Queue<VoronoiEdge>(cells.Values.ElementAt(i));
+				var firstEdge = edges.Dequeue();
+				List<Complex> polygonPoints = new List<Complex>();
+				polygonPoints.Add(new Complex(firstEdge.VVertexA.X * scale, firstEdge.VVertexA.Y * scale));
+				polygonPoints.Add(new Complex(firstEdge.VVertexB.X * scale, firstEdge.VVertexB.Y * scale));
+				while (edges.Count > 0) {
+					var edge = edges.Dequeue();
 					Complex pA = new Complex(edge.VVertexA.X * scale, edge.VVertexA.Y * scale);
 					Complex pB = new Complex(edge.VVertexB.X * scale, edge.VVertexB.Y * scale);
-					new TrimmedCircLine(pA, pB).DrawGL(Color4.Gray);
+
+					if (polygonPoints[0] == pA) {
+						polygonPoints.Insert(0, pB);
+						continue;
+					}
+					if (polygonPoints[0] == pB) {
+						polygonPoints.Insert(0, pA);
+						continue;
+					}
+
+					if (polygonPoints[polygonPoints.Count -1] == pA) {
+						polygonPoints.Add(pB);
+						continue;
+					}
+					if (polygonPoints[polygonPoints.Count -1] == pB) {
+						polygonPoints.Add(pA);
+						continue;
+					}
+
+					edges.Enqueue(edge);
 				}
+
+		
+				for (int j = 2; j < polygonPoints.Count; j++) {
+					GL.Begin(BeginMode.Triangles);  
+					GL.Color4(color);
+				    GL.Vertex3(polygonPoints[0].Vector3d);            
+				    GL.Vertex3(polygonPoints[j-1].Vector3d);            
+				    GL.Vertex3(polygonPoints[j].Vector3d);            
+					GL.End();  
+				}
+
+				for (int j = 1; j < polygonPoints.Count; j++) 
+					new TrimmedCircLine(polygonPoints[j-1], polygonPoints[j]).DrawGL(Color4.Gray);
+
 			}
+
 //            foreach (Vector vector in cells.Keys) {
 //                double average = cells[vector].Average(edge => Vector.Dist(edge.VVertexA, edge.VVertexB));
 //                float stDev = (float) cells[vector].Sum(edge => Math.Pow(Vector.Dist(edge.VVertexA, edge.VVertexB) - average, 2))/cells[vector].Count;
