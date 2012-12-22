@@ -93,7 +93,7 @@ namespace Poincare.Application {
 //			if (Joysticks.Count == 1)
 //				joystickControl = new JoystickControl(Joysticks[0], this);
 			
-			Reset(P, Q, imageIndex);
+			Reset();
 		}
 
 		public void ToggleFullscreen() {
@@ -137,11 +137,15 @@ namespace Poincare.Application {
 			base.OnUpdateFrame(e);
 		}
 
+		int modR = 13;
+		int modG = 21;
+		int modB = 34;
+		List<List<Complex>> polygons = new List<List<Complex>>();
+		double Phi = (Math.Sqrt(5) + 1) / 2;
+		double Tau = Math.PI * 2;
+		double scale = 3e-2;
+		int[] mapR, mapG, mapB;
 		public void Reset() {
-			Reset(P, Q, imageIndex);
-		}
-
-		private void Reset(int p, int q, int pictureIndex) {
 			GL.Enable(EnableCap.LineSmooth);
 			GL.Enable(EnableCap.PolygonSmooth);
 			//		GL.Enable(EnableCap.DepthTest);
@@ -150,67 +154,18 @@ namespace Poincare.Application {
 			GL.LoadMatrix(ref modelview);
 			
 			startTime = time;
-		}
-
-		/// <summary>
-		/// Called when it is time to render the next frame. Add your rendering code here.
-		/// </summary>
-		/// <param name="e">Contains timing information.</param>
-		protected override void OnRenderFrame(FrameEventArgs e) {
-			//GC.Collect();
-
-			//	GC.WaitForPendingFinalizers();
-			base.OnRenderFrame(e);
-			
-			oldTime = time;
-			time = (double)System.DateTime.Now.Ticks / TimeSpan.TicksPerSecond;
-//			Console.WriteLine(string.Format("Frame:{0:F5} Avg:{1:F5}", time - oldTime, (time - startTime) / ++drawCount));
-			
-			if (IsRandomizing && time - resetTime > resetDuration) {
-	//			Randomize();
-				resetTime = time;
-			}
-			
-//			if (joystickControl != null)
-//				joystickControl.Sample(disc.DrawTime);
-			
-			mouseControl.Sample();
-
-			Mobius movement =
-				Mobius.CreateRotation(AngleOffset) *
-					Mobius.CreateDiscTranslation(Complex.Zero, Offset);
-			
-			if (IsMoving)
-				movement = Mobius.CreateDiscTranslation(Complex.Zero, Complex.CreatePolar(0.01 * Math.Sin(2 * Math.PI * time / 50), 2 * Math.PI * time / 30)) * movement;
-			
-			ImageOffset += ImageSpeed;
-
-			GL.ClearColor(Color4.Black);
-			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
-			double Phi = (Math.Sqrt(5) + 1) / 2;
-			double Tau = Math.PI * 2;
 
 			int seeds = 1024;
 			int extraSeeds = 256;
 			Vector[] points = new Vector[seeds + extraSeeds];
-			double scale = 3e-2;
 
 			for (int i = 0; i < seeds + extraSeeds; i++) {
 			    double theta = (double) (i+1) * Tau / Phi;
-            //  double r = Math.Pow(Math.E, (double) i/seeds);
                 double r = Math.Sqrt( i);
 			    double x = (r) * Math.Cos(theta);
 			    double y = (r) * Math.Sin(theta);
 			    
 				points[i] = new Vector(new double[] {x, y});
-
-			//	new Complex(x*scale, y*scale).DrawGL(new Color4((float)(i % 2), (float)(i % 3) / 2, (float)(i % 5) / 4, 1));
-			//	new Complex(x*scale, y*scale).DrawGL(new Color4((float)(i % 4), (float)((i/4) % 4), (float)((i/16) % 4), 1));
-			//	new Complex(x*scale, y*scale).DrawGL(new Color4((float)(i % 2), (float)((i/2) % 2), (float)((i/4) % 2), 1));
-		
-			//	var color = new Color4((float)(i % 2), (float)(i % 3), (float)(i % 5), 1);
-			//	new Complex(x*scale, y*scale).DrawGL(color);
 			}
 
 			VoronoiGraph graph = Fortune.ComputeVoronoiGraph(points);
@@ -246,30 +201,9 @@ namespace Poincare.Application {
 					samples[i] = pA * (1-ratio) + pB * ratio;
 				}
 
-		//		samples = samples.Select(p => Complex.CreatePolar(Math.Sqrt(Math.Log(Math.Max(p.Modulus, 1))) * scale, p.Argument)).ToArray();
-				samples = samples.Select(p => p * scale).ToArray();
-
-		//		cells = cells.OrderBy(v => v.Key.SquaredLength).ToDictionary();
-		//		for (int i = 1; i < sampleCount; i++) {
-		//			if (samples[i-1] != Complex.Zero && samples[i] != Complex.Zero)
-		//				new TrimmedCircLine(samples[i-1], samples[i]).DrawGL(Color4.Blue);
-		//		}
             }
 				
-			int modR = 3;
-			int modG = 5;
-			int modB = 8;
 			for (int i = 0; i < seeds; i++) {
-				var color = new Color4(
-					(((i+(int)time*22) % modR) == 0)?1f:0f,
-					(((i+(int)time*22) % modG) == 0)?1f:0f,
-					(((i+(int)time*22) % modB) == 0)?1f:0f,
-					1f);
-
-				Vector v = cells.Keys.ElementAt(i);
-
-				new Complex(v.X * scale, v.Y * scale).DrawGL(color);
-
 				Queue<VoronoiEdge> edges =new Queue<VoronoiEdge>(cells.Values.ElementAt(i));
 				var firstEdge = edges.Dequeue();
 				List<Complex> polygonPoints = new List<Complex>();
@@ -301,30 +235,81 @@ namespace Poincare.Application {
 					edges.Enqueue(edge);
 				}
 
-		
-				for (int j = 2; j < polygonPoints.Count; j++) {
-					GL.Begin(BeginMode.Triangles);  
-					GL.Color4(color);
-				    GL.Vertex3(polygonPoints[0].Vector3d);            
-				    GL.Vertex3(polygonPoints[j-1].Vector3d);            
-				    GL.Vertex3(polygonPoints[j].Vector3d);            
-					GL.End();  
-				}
+				polygons.Add(polygonPoints);
+			}
+
+			mapR = CreateIndexMap(modR, cells);
+			mapG = CreateIndexMap(modG, cells);
+			mapB = CreateIndexMap(modB, cells);
+		}
+
+		private int[] CreateIndexMap(int size, IDictionary<Vector, List<VoronoiEdge>> cells) {
+			var centers = cells.Keys
+				.Take(size * 3)
+				.Skip(size * 2)
+				.Select(v => new Complex(v.X * scale, v.Y * scale))
+				.ToArray();
+
+			var ordered = centers
+				.OrderBy(c => c.Argument)
+				.ToList();
+
+			var value = new int[size];
+			for (int i = 0; i < size; i++) 
+				value[i] = ordered.IndexOf(centers[i]);
+
+			return value;
+		}
+
+		/// <summary>
+		/// Called when it is time to render the next frame. Add your rendering code here.
+		/// </summary>
+		/// <param name="e">Contains timing information.</param>
+		protected override void OnRenderFrame(FrameEventArgs e) {
+			//GC.Collect();
+
+			//	GC.WaitForPendingFinalizers();
+			base.OnRenderFrame(e);
+			
+			oldTime = time;
+			time = (double)System.DateTime.Now.Ticks / TimeSpan.TicksPerSecond;
+//			Console.WriteLine(string.Format("Frame:{0:F5} Avg:{1:F5}", time - oldTime, (time - startTime) / ++drawCount));
+			
+			if (IsRandomizing && time - resetTime > resetDuration) {
+	//			Randomize();
+				resetTime = time;
+			}
+			
+//			if (joystickControl != null)
+//				joystickControl.Sample(disc.DrawTime);
+			
+			mouseControl.Sample();
+
+			GL.ClearColor(Color4.Black);
+			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+			for (int i = 0; i < polygons.Count; i++) {	
+				var polygonPoints = polygons[i];
+
+				var color = new Color4(
+					LightValue(time, modR, mapR[i % modR]),
+					LightValue(time, modG, mapG[i % modG]),
+					LightValue(time, modB, mapB[i % modB]),
+					1f);
+
+				GL.Begin(BeginMode.TriangleFan);  
+				GL.Color4(color);
+				for (int j = 0; j < polygonPoints.Count; j++)
+					GL.Vertex3(polygonPoints[j].Vector3d);            
+				GL.End();  
 
 				for (int j = 1; j < polygonPoints.Count; j++) 
 					new TrimmedCircLine(polygonPoints[j-1], polygonPoints[j]).DrawGL(Color4.Gray);
 
 			}
 
-//            foreach (Vector vector in cells.Keys) {
-//                double average = cells[vector].Average(edge => Vector.Dist(edge.VVertexA, edge.VVertexB));
-//                float stDev = (float) cells[vector].Sum(edge => Math.Pow(Vector.Dist(edge.VVertexA, edge.VVertexB) - average, 2))/cells[vector].Count;
-//
-//				Complex c = new Complex(vector.X, vector.Y);
-//				c = Complex.CreatePolar(Math.Sqrt(Math.Log(c.Modulus)) * scale, c.Argument);
-//		//		c *= scale;
-//                c.DrawGL(new Color4(stDev, 1-stDev, 0, 1));
-//            }
+//			var random = new Random();
+//			new Complex(random.NextDouble()*scale, random.NextDouble()*scale).DrawGL(Color4.Wheat);
 
 			//PolarDemo(time);
 			//	LoopDemo(mousePos.Re);
@@ -332,6 +317,14 @@ namespace Poincare.Application {
 		//	SaveGL(time.ToString("000000000.000000"));
 
 			SwapBuffers();
+		}
+
+		private float LightValue(double time, int size, int index) {
+			double speed = 4;
+			double slope = 4;
+			double center = (time * speed) % size;
+			double radius = Math.Min(Math.Min(Math.Abs(index - size - center), Math.Abs(index - center)), Math.Abs(index + size - center));
+			return (float)(1 - slope/size * radius);
 		}
 
 		// http://www.opengl.org/discussion_boards/showthread.php/165932-Capture-OpenGL-screen-C/page2
