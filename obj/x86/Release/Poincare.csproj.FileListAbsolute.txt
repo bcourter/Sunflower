@@ -1,7 +1,0 @@
-D:\Poincare-win\Poincare\bin\Release\Poincare.exe
-D:\Poincare-win\Poincare\bin\Release\OpenTK.dll
-D:\Poincare-win\Poincare\bin\Release\OpenTK.xml
-D:\Poincare-win\Poincare\obj\x86\Release\ResolveAssemblyReference.cache
-D:\Poincare-win\Poincare\obj\x86\Release\Poincare.exe
-D:\Poincare-win\Poincare\bin\Release\Resources\Default.jpg
-D:\Poincare-win\Poincare\bin\Release\README.txt

@@ -49,7 +49,7 @@ namespace Poincare.Application {
                 PoincareWindow.Reset();
             }
             if (e.Button == mapping.ButtonRandomize) {// Thumb top right
-                PoincareWindow.Randomize();
+       //         PoincareWindow.Randomize();
             }
 
 			if (e.Button == mapping.ButtonAutoMove) // Pad 7
@@ -130,7 +130,7 @@ namespace Poincare.Application {
 			if (isLimit) {
 				double ratio = 0.8; //0.8;
 				double oldAngleOffset = PoincareWindow.AngleOffset;
-				PoincareWindow.MakeLimitRotation();
+		//		PoincareWindow.MakeLimitRotation();
 				PoincareWindow.AngleOffset = (PoincareWindow.AngleOffset * (1 - ratio) + oldAngleOffset * ratio);
 			}
 			

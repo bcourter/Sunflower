@@ -37,7 +37,7 @@ namespace Poincare.Application {
 				break;
 
 			case Key.Z:
-				PoincareWindow.Randomize();
+		//		PoincareWindow.Randomize();
 				break;
 
 			case Key.R:
@@ -47,7 +47,7 @@ namespace Poincare.Application {
 				break;
 
 			case Key.L:
-				PoincareWindow.MakeLimitRotation();
+		//		PoincareWindow.MakeLimitRotation();
 				break;
 
 			case Key.I:
