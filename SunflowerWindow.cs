@@ -137,8 +137,8 @@ namespace Poincare.Application {
 			base.OnUpdateFrame(e);
 		}
 
-		int modR = 13;
-		int modG = 21;
+		int modR = 21;
+		int modG = 55;
 		int modB = 34;
 		List<List<Complex>> polygons = new List<List<Complex>>();
 		double Phi = (Math.Sqrt(5) + 1) / 2;
@@ -291,11 +291,17 @@ namespace Poincare.Application {
 			for (int i = 0; i < polygons.Count; i++) {	
 				var polygonPoints = polygons[i];
 
-				var color = new Color4(
-					LightValue(time, modR, mapR[i % modR]),
-					LightValue(time, modG, mapG[i % modG]),
-					LightValue(time, modB, mapB[i % modB]),
-					1f);
+                var color = new Color4(
+                    LightValue(time, modR, mapR[i % modR]),
+                    LightValue(time, modG, mapG[i % modG]),
+                    LightValue(time, modB, mapB[i % modB]),
+                    1f);
+                //var color = new Color4(
+                //    LightValue(time, modR, i % modR),
+                //    LightValue(time, modG, i % modG),
+                //    LightValue(time, modB, i % modB),
+                //    1f);
+
 
 				GL.Begin(BeginMode.TriangleFan);  
 				GL.Color4(color);
@@ -324,7 +330,7 @@ namespace Poincare.Application {
 			double slope = 4;
 			double center = (time * speed) % size;
 			double radius = Math.Min(Math.Min(Math.Abs(index - size - center), Math.Abs(index - center)), Math.Abs(index + size - center));
-			return (float)(1 - slope/size * radius);
+			return (float)Math.Sqrt(1 - slope/size * radius);
 		}
 
 		// http://www.opengl.org/discussion_boards/showthread.php/165932-Capture-OpenGL-screen-C/page2
