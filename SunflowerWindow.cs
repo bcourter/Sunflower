@@ -17,13 +17,12 @@ using BenTools.Mathematics;
 using Poincare.Geometry;
 
 namespace Poincare.Application {
-	public class PoincareWindow : GameWindow {
+	public class SunflowerWindow : GameWindow {
 		static GraphicsMode graphicsMode;
 		const int windowDefaultSize = 800;
-		Random random = new Random();
-		double time = System.DateTime.Now.Ticks / TimeSpan.TicksPerMinute;
-		double oldTime = System.DateTime.Now.Ticks / TimeSpan.TicksPerMinute;
-		double startTime = System.DateTime.Now.Ticks / TimeSpan.TicksPerMinute;
+		double actualTime = System.DateTime.Now.Ticks / TimeSpan.TicksPerMinute;
+		double lastActualTime;
+		double time = 0;
 		double resetTime = 0;
 		double resetDuration = 60;
 //		JoystickControl joystickControl = null;
@@ -32,6 +31,12 @@ namespace Poincare.Application {
 		int imageIndex = 0;
 		List<double> stern = new List<double>();
 
+		public bool IsSorted { get; set; }
+
+		public double Speed { get; set; }
+		public double Slope{ get; set; }
+		
+		//delete or move these...
 		public Complex Offset { get; set; }
 
 		public double AngleOffset { get; set; }
@@ -47,12 +52,18 @@ namespace Poincare.Application {
 		public double ImageOffset { get; set; }
 
 		public bool IsInverting { get; set; }
-	
+		//...
+
 		/// <summary>Creates a window with the specified title.</summary>
-		public PoincareWindow()
+		public SunflowerWindow()
 			: base(windowDefaultSize, windowDefaultSize, graphicsMode, "Poincare'") {
 			VSync = VSyncMode.Off;
 	
+			IsSorted = true;
+
+			Speed = 4;
+			Slope = 4;
+
 			Offset = Complex.Zero;
 			AngleOffset = 0;
 			
@@ -123,7 +134,7 @@ namespace Poincare.Application {
 
 			//jetblbc	Height = Width;
 			float aspect = (float)Height / Width;
-			Matrix4 projection = Matrix4.CreateOrthographic(2, 2 * aspect, -1f, 1f);
+			Matrix4 projection = Matrix4.CreateOrthographic(2 / aspect, 2, -1f, 1f);
 			projection *= Matrix4.CreateRotationY((float)Math.PI);
 			GL.MatrixMode(MatrixMode.Projection);
 			GL.LoadMatrix(ref projection);
@@ -137,14 +148,12 @@ namespace Poincare.Application {
 			base.OnUpdateFrame(e);
 		}
 
-		int modR = 21;
-		int modG = 55;
-		int modB = 34;
 		List<List<Complex>> polygons = new List<List<Complex>>();
 		double Phi = (Math.Sqrt(5) + 1) / 2;
 		double Tau = Math.PI * 2;
 		double scale = 3e-2;
-		int[] mapR, mapG, mapB;
+		ModuloActor[] actors = new ModuloActor[3];
+		SortedDictionary<Vector, List<VoronoiEdge>> cells;
 		public void Reset() {
 			GL.Enable(EnableCap.LineSmooth);
 			GL.Enable(EnableCap.PolygonSmooth);
@@ -153,24 +162,23 @@ namespace Poincare.Application {
 			GL.MatrixMode(MatrixMode.Modelview);
 			GL.LoadMatrix(ref modelview);
 			
-			startTime = time;
-
 			int seeds = 1024;
 			int extraSeeds = 256;
 			Vector[] points = new Vector[seeds + extraSeeds];
 
+			double thetaOffset = -Tau / Phi + Tau/4;
 			for (int i = 0; i < seeds + extraSeeds; i++) {
 			    double theta = (double) (i+1) * Tau / Phi;
                 double r = Math.Sqrt( i);
-			    double x = (r) * Math.Cos(theta);
-			    double y = (r) * Math.Sin(theta);
+			    double x = (r) * Math.Cos(theta + thetaOffset);
+			    double y = (r) * Math.Sin(theta + thetaOffset);
 			    
 				points[i] = new Vector(new double[] {x, y});
 			}
 
 			VoronoiGraph graph = Fortune.ComputeVoronoiGraph(points);
 
-            var cells = new SortedDictionary<Vector, List<VoronoiEdge>>();
+            cells = new SortedDictionary<Vector, List<VoronoiEdge>>();
             foreach (VoronoiEdge edge in graph.Edges) {
                 if (double.IsNaN(edge.VVertexA.X) ||
                     double.IsNaN(edge.VVertexA.Y) ||
@@ -238,9 +246,14 @@ namespace Poincare.Application {
 				polygons.Add(polygonPoints);
 			}
 
-			mapR = CreateIndexMap(modR, cells);
-			mapG = CreateIndexMap(modG, cells);
-			mapB = CreateIndexMap(modB, cells);
+			for (int i = 0; i <= ModuloActor.MaxMod; i++)
+				ModuloActor.Maps[i] = CreateIndexMap(i, cells);
+
+			actors[0] = new ModuloActor(0, 0);
+			actors[1] = new ModuloActor(0, 1 / 3);
+			actors[2] = new ModuloActor(0, 2 / 3);
+
+			ModuloActor.AnnounceFibonaccis();
 		}
 
 		private int[] CreateIndexMap(int size, IDictionary<Vector, List<VoronoiEdge>> cells) {
@@ -261,6 +274,7 @@ namespace Poincare.Application {
 			return value;
 		}
 
+
 		/// <summary>
 		/// Called when it is time to render the next frame. Add your rendering code here.
 		/// </summary>
@@ -271,9 +285,12 @@ namespace Poincare.Application {
 			//	GC.WaitForPendingFinalizers();
 			base.OnRenderFrame(e);
 			
-			oldTime = time;
-			time = (double)System.DateTime.Now.Ticks / TimeSpan.TicksPerSecond;
-//			Console.WriteLine(string.Format("Frame:{0:F5} Avg:{1:F5}", time - oldTime, (time - startTime) / ++drawCount));
+			lastActualTime = actualTime;
+			actualTime = (double)System.DateTime.Now.Ticks / TimeSpan.TicksPerSecond;
+			double elapsed = (actualTime - lastActualTime) * Speed;
+			time += elapsed;
+
+			//			Console.WriteLine(string.Format("Frame:{0:F5} Avg:{1:F5}", time - oldTime, (time - startTime) / ++drawCount));
 			
 			if (IsRandomizing && time - resetTime > resetDuration) {
 	//			Randomize();
@@ -288,21 +305,29 @@ namespace Poincare.Application {
 			GL.ClearColor(Color4.Black);
 			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
+			ModuloActor.UpdateAll(elapsed);
+			FeedbackActor.UpdateAll(elapsed);
+
+			var FeedbackActorMap = new Dictionary<int, FeedbackActor[]>();
+			if (FeedbackActor.AllActors != null)
+				FeedbackActorMap = FeedbackActor.AllActors
+					.GroupBy(a => a.Index)
+					.ToDictionary(g => g.Key, g => g.ToArray())
+				;
+						
 			for (int i = 0; i < polygons.Count; i++) {	
-				var polygonPoints = polygons[i];
-
-                var color = new Color4(
-                    LightValue(time, modR, mapR[i % modR]),
-                    LightValue(time, modG, mapG[i % modG]),
-                    LightValue(time, modB, mapB[i % modB]),
+				var color = new Color4(
+                    (float) actors[0].GetValue(i),
+                    (float) actors[1].GetValue(i),
+                    (float) actors[2].GetValue(i),
                     1f);
-                //var color = new Color4(
-                //    LightValue(time, modR, i % modR),
-                //    LightValue(time, modG, i % modG),
-                //    LightValue(time, modB, i % modB),
-                //    1f);
 
-
+				if (FeedbackActorMap.ContainsKey(i)) {
+					foreach (FeedbackActor actor in FeedbackActorMap[i])
+						color = BlendColors(actor.GetColor(), color);
+				}
+                   
+				var polygonPoints = polygons[i];
 				GL.Begin(BeginMode.TriangleFan);  
 				GL.Color4(color);
 				for (int j = 0; j < polygonPoints.Count; j++)
@@ -310,9 +335,10 @@ namespace Poincare.Application {
 				GL.End();  
 
 				for (int j = 1; j < polygonPoints.Count; j++) 
-					new TrimmedCircLine(polygonPoints[j-1], polygonPoints[j]).DrawGL(Color4.Gray);
+					new TrimmedCircLine(polygonPoints[j-1], polygonPoints[j]).DrawGL(new Color4(0.1f, 0.1f, 0.1f, 1));
 
 			}
+
 
 //			var random = new Random();
 //			new Complex(random.NextDouble()*scale, random.NextDouble()*scale).DrawGL(Color4.Wheat);
@@ -325,12 +351,16 @@ namespace Poincare.Application {
 			SwapBuffers();
 		}
 
-		private float LightValue(double time, int size, int index) {
-			double speed = 4;
-			double slope = 4;
-			double center = (time * speed) % size;
-			double radius = Math.Min(Math.Min(Math.Abs(index - size - center), Math.Abs(index - center)), Math.Abs(index + size - center));
-			return (float)Math.Sqrt(1 - slope/size * radius);
+		// wikipedia alpha_compostiting
+		private	Color4 BlendColors(Color4 source, Color4 dest) {
+			float outA = source.A + dest.A * (1 - source.A);
+
+			return new Color4(
+				(source.R * source.A + dest.R * dest.A * (1-source.A)) / outA,
+				(source.G * source.A + dest.G * dest.A * (1-source.A)) / outA,
+				(source.B * source.A + dest.B * dest.A * (1-source.A)) / outA,
+				outA
+			);
 		}
 
 		// http://www.opengl.org/discussion_boards/showthread.php/165932-Capture-OpenGL-screen-C/page2
@@ -420,6 +450,10 @@ namespace Poincare.Application {
 			}
 		}
 
+		public void WriteStatus() {
+			Console.WriteLine(string.Format("({0}, {1}, {2})", actors[0].Modulo,  actors[1].Modulo,  actors[2].Modulo));
+		}
+
 		/// <summary>
 		/// The main entry point for the application.
 		/// </summary>
@@ -431,7 +465,7 @@ namespace Poincare.Application {
 			// The 'using' idiom guarantees proper resource cleanup.
 			// We request 30 UpdateFrame events per second, and unlimited
 			// RenderFrame events (as fast as the computer can handle).
-			using (PoincareWindow game = new PoincareWindow()) {
+			using (SunflowerWindow game = new SunflowerWindow()) {
 				game.Run(30.0);
 			}
 		}
@@ -467,5 +501,17 @@ namespace Poincare.Application {
 				imageIndex %= ImageFiles.Count;
 			}
 		}
-	}
+
+		public double Time {
+			get { return time;}
+		}
+
+		public ModuloActor[] Actors {
+			get { return actors;}
+		}
+
+		public IDictionary<Vector, List<VoronoiEdge>> Cells {
+			get { return cells; }
+		}
+}
 }

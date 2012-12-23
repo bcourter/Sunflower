@@ -16,9 +16,9 @@ namespace Poincare.Application {
 		
 		public JoystickDevice Joystick { get; private set; }
 
-		public PoincareWindow PoincareWindow { get; private set; }
+		public SunflowerWindow PoincareWindow { get; private set; }
 		
-		public JoystickControl(JoystickDevice joystick, PoincareWindow poincareWindow) {
+		public JoystickControl(JoystickDevice joystick, SunflowerWindow poincareWindow) {
 			Joystick = joystick;
 			PoincareWindow = poincareWindow;
 			

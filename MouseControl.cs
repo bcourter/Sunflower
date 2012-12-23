@@ -13,9 +13,9 @@ namespace Poincare.Application {
 		bool isDraggingAngle;
 		Complex mousePos, initialMousePos;
 
-		public PoincareWindow PoincareWindow { get; private set; }
+		public SunflowerWindow PoincareWindow { get; private set; }
 		
-		public MouseControl(PoincareWindow poincareWindow) {
+		public MouseControl(SunflowerWindow poincareWindow) {
 			PoincareWindow = poincareWindow;
 			
 			PoincareWindow.Mouse.ButtonDown += Mouse_ButtonDown;
