@@ -25,6 +25,7 @@ namespace Poincare.Application {
 		public bool IsInverted { get; set; }
 		public bool IsSorted { get; set; }
 		public double Time { get; set; }
+		public double FadeInTime { get; set; }
 
 		public static readonly List<int> FibonacciNumbers = new List<int>();
 		
@@ -36,6 +37,7 @@ namespace Poincare.Application {
 			IsInverted = false;
 			IsSorted = true;
 			Time = 0;
+			FadeInTime = 1.6;
 
 			if (AllActors==null) {
 				AllActors = new List<ModuloActor>();
@@ -69,8 +71,12 @@ namespace Poincare.Application {
 		}
 
 		public static void AnnounceFibonaccis() {
+			AnnounceFibonaccis(new Color4(1f, 1f, 1f, 0.5f));
+		}
+
+		public static void AnnounceFibonaccis(Color4 color) {
 			foreach (int n in ModuloActor.FibonacciNumbers)
-				new FeedbackActor(n, new Color4(1f, 1f, 1f, 0.5f), 3);
+				new FeedbackActor(n, color, 5);
 		}
 
 		public void Update(double elapsed) {
@@ -87,7 +93,7 @@ namespace Poincare.Application {
 
 			double center = Time % modulo;
 			double distance = Math.Min(Math.Min(Math.Abs(index - modulo - center), Math.Abs(index - center)), Math.Abs(index + modulo - center));
-			return Math.Sqrt(1 - Slope/modulo * distance);
+			return Math.Sqrt(1 - Slope/modulo * distance) * (Time < FadeInTime ? Math.Max(Time/FadeInTime, 0.25) : 1);
 		}
 
 		public static int[][] Maps { 
@@ -97,7 +103,10 @@ namespace Poincare.Application {
 		
 		public int Modulo { 
 			get { return modulo; } 
-			set { modulo = Math.Max(Math.Min(value, MaxMod), 0); }
+			set { 
+				modulo = Math.Max(Math.Min(value, MaxMod), 0);
+				Time = 0;
+			}
 		}
 		
 	}

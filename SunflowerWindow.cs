@@ -258,8 +258,8 @@ namespace Poincare.Application {
 
 		private int[] CreateIndexMap(int size, IDictionary<Vector, List<VoronoiEdge>> cells) {
 			var centers = cells.Keys
-				.Take(size * 3)
-				.Skip(size * 2)
+				.Take(size < 377 ? size * 3 : size)
+				.Skip(size < 377 ? size * 2 : 0)
 				.Select(v => new Complex(v.X * scale, v.Y * scale))
 				.ToArray();
 
@@ -322,11 +322,13 @@ namespace Poincare.Application {
                     (float) actors[2].GetValue(i),
                     1f);
 
+		//		color = BlendColors(new Color4(1f,1f,1f,0.5f), color);
+
 				if (FeedbackActorMap.ContainsKey(i)) {
 					foreach (FeedbackActor actor in FeedbackActorMap[i])
-						color = BlendColors(actor.GetColor(), color);
+						color = BlendColors(actor.GetColor(), new Color4(color.R, color.G, color.B, 1f));
 				}
-                   
+
 				var polygonPoints = polygons[i];
 				GL.Begin(BeginMode.TriangleFan);  
 				GL.Color4(color);
@@ -353,12 +355,13 @@ namespace Poincare.Application {
 
 		// wikipedia alpha_compostiting
 		private	Color4 BlendColors(Color4 source, Color4 dest) {
+			Debug.Assert(dest.A == 1);
 			float outA = source.A + dest.A * (1 - source.A);
 
 			return new Color4(
-				(source.R * source.A + dest.R * dest.A * (1-source.A)) / outA,
-				(source.G * source.A + dest.G * dest.A * (1-source.A)) / outA,
-				(source.B * source.A + dest.B * dest.A * (1-source.A)) / outA,
+				outA == 0 ? 0 : (source.R * source.A + dest.R * dest.A * (1-source.A)) / outA,
+				outA == 0 ? 0 : (source.G * source.A + dest.G * dest.A * (1-source.A)) / outA,
+				outA == 0 ? 0 : (source.B * source.A + dest.B * dest.A * (1-source.A)) / outA,
 				outA
 			);
 		}

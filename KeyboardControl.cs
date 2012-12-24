@@ -21,6 +21,17 @@ namespace Poincare.Application {
 			SunflowerWindow.Keyboard.KeyRepeat = true;
 		}
 
+		private void SetModulo(int channel, Color4 color) {
+			bool isShift = SunflowerWindow.Keyboard[Key.LShift] || SunflowerWindow.Keyboard[Key.RShift];
+			SunflowerWindow.Actors[channel].Modulo += isShift ? -1 : 1;
+
+			new FeedbackActor(SunflowerWindow.Actors[channel].Modulo, color, 8);
+			if (ModuloActor.FibonacciNumbers.Contains(SunflowerWindow.Actors[channel].Modulo)) 
+					ModuloActor.AnnounceFibonaccis(color);
+
+			SunflowerWindow.WriteStatus();
+		}
+
 		private void Keyboard_KeyDown(object sender, KeyboardKeyEventArgs e) {
 			bool isShift = SunflowerWindow.Keyboard[Key.LShift] || SunflowerWindow.Keyboard[Key.RShift];
 		
@@ -28,31 +39,17 @@ namespace Poincare.Application {
 
 			case Key.Number1:
 			case Key.Keypad1:
-				SunflowerWindow.Actors[0].Modulo += isShift ? -1 : 1;
-				for (int i = 0; i < 1024; i++)
-					new FeedbackActor(i, new Color4(0f, 0f, 0f, 1f), 4);
-
-			//	SunflowerWindow.Cells SunflowerWindow.Actors[0].Modulo
-
-				new FeedbackActor(SunflowerWindow.Actors[0].Modulo, new Color4(1f, 0.5f, 0.5f, 1f), 8);
-				if (ModuloActor.FibonacciNumbers.Contains(SunflowerWindow.Actors[0].Modulo)) 
-					ModuloActor.AnnounceFibonaccis();
-
-				SunflowerWindow.WriteStatus();
+				SetModulo(0, new Color4(1f, 0.5f, 0.5f, 1f));
 				break;
 			
 			case Key.Number2:
 			case Key.Keypad2:
-				SunflowerWindow.Actors[1].Modulo += isShift ? -1 : 1;
-				new FeedbackActor(SunflowerWindow.Actors[1].Modulo, new Color4(0f, 1f, 0f, 1f), 1);
-				SunflowerWindow.WriteStatus();
+				SetModulo(1, new Color4(0.5f, 1f, 0.5f, 1f));
 				break;
 			
 			case Key.Number3:
 			case Key.Keypad3:
-				SunflowerWindow.Actors[2].Modulo += isShift ? -1 : 1;
-				new FeedbackActor(SunflowerWindow.Actors[1].Modulo, new Color4(0f, 0f, 1f, 1f), 1);
-				SunflowerWindow.WriteStatus();
+				SetModulo(2, new Color4(0.5f, 0.5f, 1f, 1f));
 				break;
 
 			case Key.Number4:
