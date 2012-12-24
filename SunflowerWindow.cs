@@ -322,6 +322,20 @@ namespace Poincare.Application {
                     (float) actors[2].GetValue(i),
                     1f);
 
+				if (float.IsNaN(color.R) || !(color.R>=0 && color.R<=1)) {
+					var xxx = actors[0].GetValue(i);
+					Debug.Fail("");
+				}
+
+		//			color = new Color4(0f,0f,0f,1f);
+//					color = new Color4(
+//					(float)((double)color.R /11),
+//					(float)((double)color.G /11),
+//					(float)((double)color.B /11),
+//					1f);
+//		
+			//		color = BlendColors(new Color4(0f,0f,0f,1f), color);
+
 		//		color = BlendColors(new Color4(1f,1f,1f,0.5f), color);
 
 				if (FeedbackActorMap.ContainsKey(i)) {

@@ -93,7 +93,11 @@ namespace Poincare.Application {
 
 			double center = Time % modulo;
 			double distance = Math.Min(Math.Min(Math.Abs(index - modulo - center), Math.Abs(index - center)), Math.Abs(index + modulo - center));
-			return Math.Sqrt(1 - Slope/modulo * distance) * (Time < FadeInTime ? Math.Max(Time/FadeInTime, 0.25) : 1);
+			double value = Math.Sqrt(1 - Slope/modulo * distance);
+			value =  value * (Time < FadeInTime ? Math.Max(Time/FadeInTime, 0.25) : 1);
+//		if(double.IsNaN(value))
+//				Debug.Fail("");
+			return value;
 		}
 
 		public static int[][] Maps { 
