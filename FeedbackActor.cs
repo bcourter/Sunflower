@@ -22,7 +22,7 @@ namespace Poincare.Application {
 		public double Time { get; set; }
 
 		public FeedbackActor(int index, Color4 color, double duration) {
-			Index = index;
+			Index = index-1;
 			Color = color;
 			Duration = duration;
 			Time = 0;

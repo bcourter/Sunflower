@@ -75,7 +75,7 @@ namespace Poincare.Application {
 		}
 
 		public static void AnnounceFibonaccis(Color4 color) {
-			foreach (int n in ModuloActor.FibonacciNumbers)
+			foreach (int n in ModuloActor.FibonacciNumbers) 
 				new FeedbackActor(n, color, 5);
 		}
 
@@ -93,10 +93,8 @@ namespace Poincare.Application {
 
 			double center = Time % modulo;
 			double distance = Math.Min(Math.Min(Math.Abs(index - modulo - center), Math.Abs(index - center)), Math.Abs(index + modulo - center));
-			double value = Math.Sqrt(1 - Slope/modulo * distance);
+            double value = Math.Sqrt(Math.Max(1 - Slope / modulo * distance, 0));
 			value =  value * (Time < FadeInTime ? Math.Max(Time/FadeInTime, 0.25) : 1);
-//		if(double.IsNaN(value))
-//				Debug.Fail("");
 			return value;
 		}
 

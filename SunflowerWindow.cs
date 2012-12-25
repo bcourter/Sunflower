@@ -166,7 +166,7 @@ namespace Poincare.Application {
 			int extraSeeds = 256;
 			Vector[] points = new Vector[seeds + extraSeeds];
 
-			double thetaOffset = -Tau / Phi + Tau/4;
+            double thetaOffset = Tau / 4;
 			for (int i = 0; i < seeds + extraSeeds; i++) {
 			    double theta = (double) (i+1) * Tau / Phi;
                 double r = Math.Sqrt( i);
@@ -321,22 +321,6 @@ namespace Poincare.Application {
                     (float) actors[1].GetValue(i),
                     (float) actors[2].GetValue(i),
                     1f);
-
-				if (float.IsNaN(color.R) || !(color.R>=0 && color.R<=1)) {
-					var xxx = actors[0].GetValue(i);
-					Debug.Fail("");
-				}
-
-		//			color = new Color4(0f,0f,0f,1f);
-//					color = new Color4(
-//					(float)((double)color.R /11),
-//					(float)((double)color.G /11),
-//					(float)((double)color.B /11),
-//					1f);
-//		
-			//		color = BlendColors(new Color4(0f,0f,0f,1f), color);
-
-		//		color = BlendColors(new Color4(1f,1f,1f,0.5f), color);
 
 				if (FeedbackActorMap.ContainsKey(i)) {
 					foreach (FeedbackActor actor in FeedbackActorMap[i])
