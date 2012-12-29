@@ -8,9 +8,9 @@ using OpenTK;
 using OpenTK.Input;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
-using Poincare.Geometry;
+using Sunflower.Geometry;
 
-namespace Poincare.Application {
+namespace Sunflower.Application {
     public class KeyboardControl {
         public SunflowerWindow SunflowerWindow { get; private set; }
 
@@ -21,19 +21,6 @@ namespace Poincare.Application {
             SunflowerWindow.Keyboard.KeyRepeat = true;
         }
 
-        private void SetModulo(int channel, Color4 color) {
-            bool isShift = SunflowerWindow.Keyboard[Key.LShift] || SunflowerWindow.Keyboard[Key.RShift];
-            SunflowerWindow.Actors[channel].Modulo += isShift ? -1 : 1;
-
-            new FeedbackActor(SunflowerWindow.Actors[channel].Modulo, color, 8);
-            if (ModuloActor.FibonacciNumbers.Contains(SunflowerWindow.Actors[channel].Modulo)) {
-                ModuloActor.AnnounceFibonaccis(color);
-                new FeedbackActor(SunflowerWindow.Actors[channel].Modulo, Color4.White, 2);
-            }
-
-            SunflowerWindow.WriteStatus();
-        }
-
         private void Keyboard_KeyDown(object sender, KeyboardKeyEventArgs e) {
             bool isShift = SunflowerWindow.Keyboard[Key.LShift] || SunflowerWindow.Keyboard[Key.RShift];
             bool isCtrl = SunflowerWindow.Keyboard[Key.LControl] || SunflowerWindow.Keyboard[Key.RControl];
@@ -42,17 +29,17 @@ namespace Poincare.Application {
 
                 case Key.Number1:
                 case Key.Keypad1:
-                    SetModulo(0, new Color4(1f, 0.5f, 0.5f, 1f));
+                    SunflowerWindow.Actors[0].Modulo += isShift ? -1 : 1;
                     break;
 
                 case Key.Number2:
                 case Key.Keypad2:
-                    SetModulo(1, new Color4(0.5f, 1f, 0.5f, 1f));
+                    SunflowerWindow.Actors[1].Modulo += isShift ? -1 : 1;
                     break;
 
                 case Key.Number3:
                 case Key.Keypad3:
-                    SetModulo(2, new Color4(0.5f, 0.5f, 1f, 1f));
+                    SunflowerWindow.Actors[2].Modulo += isShift ? -1 : 1;
                     break;
 
                 case Key.Number4:
@@ -106,11 +93,6 @@ namespace Poincare.Application {
                     SunflowerWindow.Exit();
                     break;
 
-
-                case Key.N:
-                    SunflowerWindow.ImageIndex = (SunflowerWindow.ImageIndex + (isShift ? SunflowerWindow.ImageFiles.Count - 1 : 1)) % SunflowerWindow.ImageFiles.Count;
-                    SunflowerWindow.Reset();
-                    break;
 
                 case Key.R:
                     SunflowerWindow.Offset = Complex.Zero;

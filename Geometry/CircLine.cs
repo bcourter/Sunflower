@@ -7,7 +7,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 
-namespace Poincare.Geometry {
+namespace Sunflower.Geometry {
 	// http://www.cefns.nau.edu/~schulz/moe.pdf
 	public abstract class CircLine {
 		protected double a, c;

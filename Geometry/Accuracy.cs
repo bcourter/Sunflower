@@ -1,6 +1,6 @@
 using System;
 
-namespace Poincare.Geometry {
+namespace Sunflower.Geometry {
 	public static class Accuracy {
 		public const double LinearTolerance = 1E-9;
 		public const double AngularTolerance = 1E-3;

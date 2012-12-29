@@ -4,7 +4,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 
-namespace Poincare.Geometry {	
+namespace Sunflower.Geometry {	
 	public struct Complex {
 		public readonly double Re;
 		public readonly double Im;

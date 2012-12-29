@@ -10,9 +10,9 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using BenTools.Data;
 using BenTools.Mathematics;
-using Poincare.Geometry;
+using Sunflower.Geometry;
 
-namespace Poincare.Application {
+namespace Sunflower.Application {
 	public class FeedbackActor {
 		public static List<FeedbackActor> AllActors { get; set; }
 

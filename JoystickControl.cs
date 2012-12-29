@@ -1,223 +1,143 @@
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Linq;
 
 //using System.Linq;
 using OpenTK;
 using OpenTK.Input;
-using Poincare.Geometry;
+using OpenTK.Graphics;
+using Sunflower.Geometry;
 
-namespace Poincare.Application {
-	public class JoystickControl {
-		bool isLimit = false;
-		bool isBraking = false;
-		bool disablePQ = false;
-        JoystickMapping mapping = System.Environment.OSVersion.Platform == PlatformID.Unix ? JoystickMapping.UbuntuMapping : JoystickMapping.WindowsMapping;
-		
-		public JoystickDevice Joystick { get; private set; }
+namespace Sunflower.Application {
+    public class JoystickControl {
+        bool isLimit = false;
+        bool isBraking = false;
+        bool disablePQ = false;
+        JoystickMapping mapping = System.Environment.OSVersion.Platform == PlatformID.Unix ? null : JoystickMapping.WindowsMapping;
 
-		public SunflowerWindow PoincareWindow { get; private set; }
-		
-		public JoystickControl(JoystickDevice joystick, SunflowerWindow poincareWindow) {
-			Joystick = joystick;
-			PoincareWindow = poincareWindow;
-			
-			Joystick.ButtonDown += Joystick_ButtonDown;
-			Joystick.ButtonUp += Joystick_ButtonUp;
-		}
-				
-		private void Joystick_ButtonDown(object sender, JoystickButtonEventArgs e) {
+        public JoystickDevice Joystick { get; private set; }
 
-			if (e.Button == mapping.ButtonBrake) // Trigger
-				isBraking = true;
-				
-			if (e.Button == mapping.ButtonLimitRotation) // Grip
-				isLimit = true;
+        public SunflowerWindow SunflowerWindow { get; private set; }
 
-            if (e.Button == mapping.ButtonPreviousImage) { // Thumb bottom left
-                PoincareWindow.ImageIndex--;
-                PoincareWindow.Reset();
+        public JoystickControl(JoystickDevice joystick, SunflowerWindow poincareWindow) {
+            Joystick = joystick;
+            SunflowerWindow = poincareWindow;
+
+            Joystick.ButtonDown += Joystick_ButtonDown;
+            Joystick.ButtonUp += Joystick_ButtonUp;
+        }
+
+        int[] buttonIsDown = new int[3];
+        double[] buttonDownTime = new double[3];
+        int[] SpeedDirection = new int[] { 1, 1, 1 };
+        double buttonRepeatDelay = 0.6;
+        private void Joystick_ButtonDown(object sender, JoystickButtonEventArgs e) {
+            if (mapping.ButtonDecrement.Contains(e.Button)) {
+                int index = mapping.ButtonDecrement.ToList().IndexOf(e.Button);
+                SunflowerWindow.Actors[index].Modulo--;
+                buttonIsDown[index] = -1;
+                buttonDownTime[index] = SunflowerWindow.Now;
             }
 
-            if (e.Button == mapping.ButtonNextImage) { // Thumb bottom right
-                PoincareWindow.ImageIndex++;
-                PoincareWindow.Reset();
+            if (mapping.ButtonIncrement.Contains(e.Button)) {
+                int index = mapping.ButtonIncrement.ToList().IndexOf(e.Button);
+                SunflowerWindow.Actors[index].Modulo++;
+                buttonIsDown[index] = 1;
+                buttonDownTime[index] = SunflowerWindow.Now;
             }
 
-            if (e.Button == mapping.ButtonInvert) { // Thumb top left
-                PoincareWindow.IsInverting = !PoincareWindow.IsInverting;
-                PoincareWindow.Reset();
+            if (mapping.ButtonMode.Contains(e.Button))
+                SunflowerWindow.Actors[mapping.ButtonMode.ToList().IndexOf(e.Button)].IsSorted = !SunflowerWindow.Actors[mapping.ButtonMode.ToList().IndexOf(e.Button)].IsSorted;
+
+            //if (mapping.ButtonReset.Contains(e.Button))
+            //    SunflowerWindow.Reset();
+
+        }
+
+        private void Joystick_ButtonUp(object sender, JoystickButtonEventArgs e) {
+            if (mapping.ButtonDecrement.Contains(e.Button))
+                buttonIsDown[mapping.ButtonDecrement.ToList().IndexOf(e.Button)] = 0;
+
+            if (mapping.ButtonIncrement.Contains(e.Button))
+                buttonIsDown[mapping.ButtonIncrement.ToList().IndexOf(e.Button)] = 0;
+        }
+
+        bool[] wasLastInReverse = new[] { false, false, false };
+        public void Sample(double timing) {
+            // obsolete but necessary
+#pragma warning disable 0612
+            SunflowerWindow.InputDriver.Poll();
+#pragma warning restore 0612
+
+            double scale = 100; // 0.001
+            double limit = 0.15;
+            //Console.WriteLine(string.Format("Readout Slope: ({0}, {1}, {2})", Joystick.Axis[mapping.AxisMap[0]], Joystick.Axis[mapping.AxisMap[2]], Joystick.Axis[mapping.AxisMap[4]]));
+            // Console.WriteLine(string.Format("Readout Speed: ({0}, {1}, {2})", Joystick.Axis[mapping.AxisMap[1]], Joystick.Axis[mapping.AxisMap[3]], Joystick.Axis[mapping.AxisMap[5]]));
+
+            for (int i = 0; i < 3; i++) {
+                SunflowerWindow.Actors[i].Slope = Math.Pow(-Interpolation.InterpolateRange(mapping.AxisMin[i * 2], mapping.AxisMax[i * 2], (double)Joystick.Axis[mapping.AxisMap[i * 2]]) + 1.4, 2) * 12;
+                double sign = Math.Sign(mapping.AxisReverse[i * 2]);
+                SunflowerWindow.Actors[i].Brightness = sign * Joystick.Axis[mapping.AxisMap[i * 2]] > sign * mapping.AxisReverse[i * 2] ? 0 : 1;
+
+
+                sign = Math.Sign(mapping.AxisReverse[i * 2 + 1]);
+                bool isInReverse = sign * Joystick.Axis[mapping.AxisMap[i * 2 + 1]] > sign * mapping.AxisReverse[i * 2 + 1];
+                if (!wasLastInReverse[i] && isInReverse)
+                    SpeedDirection[i] *= -1;
+
+                wasLastInReverse[i] = isInReverse;
+
+                //if (i == 2)
+                //    Console.WriteLine(string.Format("Readout Slope: ({0}, )", sign * Joystick.Axis[mapping.AxisMap[i * 2 + 1]] > sign * mapping.AxisReverse[i * 2 + 1]));
+
+
+                SunflowerWindow.Actors[i].Speed = Math.Max(0, Interpolation.InterpolateRange(mapping.AxisMin[i * 2 + 1], mapping.AxisMax[i * 2 + 1], (double)Joystick.Axis[mapping.AxisMap[i * 2 + 1]])) * 4 * SpeedDirection[i];
+
+                if (buttonIsDown[i] != 0 && SunflowerWindow.Now - buttonDownTime[i] > buttonRepeatDelay)
+                    SunflowerWindow.Actors[i].Modulo += buttonIsDown[i];
+
+
             }
-            if (e.Button == mapping.ButtonRandomize) {// Thumb top right
-       //         PoincareWindow.Randomize();
-            }
 
-			if (e.Button == mapping.ButtonAutoMove) // Pad 7
-				PoincareWindow.IsMoving = !PoincareWindow.IsMoving;
-				
-			if (e.Button == mapping.ButtonAutoRandomize) // Pad 8
-				PoincareWindow.IsRandomizing = !PoincareWindow.IsRandomizing;
 
-            if (e.Button == mapping.ButtonRecenter) { // Pad 9
-                PoincareWindow.Offset = Complex.Zero;
-                PoincareWindow.AngleOffset = 0;
-                PoincareWindow.Reset();
-            }
 
-            if (e.Button == mapping.ButtonReset) { // Pad 10
-                PoincareWindow.Offset = Complex.Zero;
-                PoincareWindow.AngleOffset = 0;
-                PoincareWindow.P = 5;
-                PoincareWindow.Q = 5;
-                PoincareWindow.ImageIndex = 0;
-                PoincareWindow.Reset();
-            }
+            //   Console.WriteLine(string.Format("Slope: ({0}, {1}, {2})", SunflowerWindow.Actors[0].Slope, SunflowerWindow.Actors[1].Slope, SunflowerWindow.Actors[2].Slope));
+            //  Console.WriteLine(string.Format("Speed: ({0}, {1}, {2})", SunflowerWindow.Actors[0].Speed, SunflowerWindow.Actors[1].Speed, SunflowerWindow.Actors[2].Speed));
+        }
+    }
 
-            if (e.Button == mapping.ButtonPreviousImage2) { // Pad 11
-                PoincareWindow.ImageIndex--;
-                PoincareWindow.Reset();
-            }
+    public class JoystickMapping {
+        public JoystickButton[] ButtonIncrement { get; set; }
+        public JoystickButton[] ButtonDecrement { get; set; }
+        public JoystickButton[] ButtonMode { get; set; }
+        public JoystickButton[] ButtonReset { get; set; }
 
-            if (e.Button == mapping.ButtonNextImage2) { // Pad 12
-                PoincareWindow.ImageIndex++;
-                PoincareWindow.Reset();
-            }
 
-		}
-		
-		private void Joystick_ButtonUp(object sender, JoystickButtonEventArgs e) {
-			if (e.Button == mapping.ButtonBrake) // Trigger
-				isBraking = false;
-	
-			if (e.Button == mapping.ButtonLimitRotation) // Grip
-				isLimit = false;
+        public int[] AxisMap { get; set; }
 
-		}
-		
-		public void Sample(double timing) {
-			// obsolete but necessary
-			#pragma warning disable 0612
-			PoincareWindow.InputDriver.Poll(); 
-			#pragma warning restore 0612
-			
-			double scale = 0.01 * timing; // 0.001
-			double limit = 0.15;
-			PoincareWindow.Offset += new Complex(Joystick.Axis[mapping.AxisX] * scale, Joystick.Axis[mapping.AxisY] * scale);
-			if (PoincareWindow.Offset.ModulusSquared > limit * limit)
-				PoincareWindow.Offset = PoincareWindow.Offset.Normalized * limit;
-			
-			PoincareWindow.AngleOffset -= Joystick.Axis[mapping.AxisRotation] * scale;
-			if (Math.Abs(PoincareWindow.AngleOffset) > limit)
-				PoincareWindow.AngleOffset = Math.Sign(PoincareWindow.AngleOffset) * limit;
-			
-			PoincareWindow.ImageSpeed = Math.Pow(Joystick.Axis[mapping.AxisImageSpeed], 2) / 5 * Math.Sign(Joystick.Axis[mapping.AxisImageSpeed]);
-			
-			if (Joystick.Axis[mapping.AxisP] == 0 && Joystick.Axis[mapping.AxisQ] == 0)
-				disablePQ = false;
-			
-			if (Joystick.Axis[mapping.AxisP] != 0 && !disablePQ) {
-				PoincareWindow.P += (int)Joystick.Axis[mapping.AxisP];
-				disablePQ = true;
-				PoincareWindow.Reset();
-			}
-			
-			if (Joystick.Axis[mapping.AxisQ] != 0 && !disablePQ) {
-				PoincareWindow.Q += (int)Joystick.Axis[mapping.AxisQ];
-				disablePQ = true;
-				PoincareWindow.Reset();
-			}
-			
-			if (isLimit) {
-				double ratio = 0.8; //0.8;
-				double oldAngleOffset = PoincareWindow.AngleOffset;
-		//		PoincareWindow.MakeLimitRotation();
-				PoincareWindow.AngleOffset = (PoincareWindow.AngleOffset * (1 - ratio) + oldAngleOffset * ratio);
-			}
-			
-			if (isBraking) {
-				PoincareWindow.Offset *= 0.9;
-				PoincareWindow.AngleOffset *= 0.9;
-			}
-		}
-	}
+        public readonly double[] AxisMin = new[] { 0.40, -0.55, -0.57, 0.53, 0.50, -0.48 };
+        public readonly double[] AxisMax = new[] { -0.98, 0.89, 0.87, -0.92, -0.92, 0.96 };
+        public readonly double[] AxisDetent = new[] { 0.73, -.79, -0.82, 0.74, 0.76, -0.73 };
+        public readonly double[] AxisReverse = new[] { 0.84, -0.84, -0.98, 0.84, 0.84, -0.84 };
 
-	public class JoystickMapping {
-		public JoystickButton ButtonBrake { get; set; }
-		public JoystickButton ButtonLimitRotation { get; set; }
-		public JoystickButton ButtonPreviousImage { get; set; }
-		public JoystickButton ButtonNextImage { get; set; }
-		public JoystickButton ButtonInvert { get; set; }
-		public JoystickButton ButtonRandomize { get; set; }
-		public JoystickButton ButtonAutoMove { get; set; }
-		public JoystickButton ButtonAutoRandomize { get; set; }
-		public JoystickButton ButtonRecenter { get; set; }
-		public JoystickButton ButtonReset { get; set; }
-		public JoystickButton ButtonPreviousImage2 { get; set; }
-		public JoystickButton ButtonNextImage2 { get; set; }
-
-		public int AxisX { get; set; }
-		public int AxisY { get; set; }
-		public int AxisRotation { get; set; }
-		public int AxisImageSpeed { get; set; }
-		public int AxisP { get; set; }
-		public int AxisQ { get; set; }
-
-		private JoystickMapping() {
-		}
-
-        public static JoystickMapping UbuntuMapping {
-            get {
-                JoystickMapping mapping = new JoystickMapping();
-                mapping.ButtonBrake = JoystickButton.Button0;
-                mapping.ButtonLimitRotation = JoystickButton.Button1;
-                mapping.ButtonPreviousImage = JoystickButton.Button2;
-                mapping.ButtonNextImage = JoystickButton.Button3;
-                mapping.ButtonInvert = JoystickButton.Button4;
-                mapping.ButtonRandomize = JoystickButton.Button5;
-                mapping.ButtonAutoMove = JoystickButton.Button6;
-                mapping.ButtonAutoRandomize = JoystickButton.Button7;
-                mapping.ButtonRecenter = JoystickButton.Button8;
-                mapping.ButtonReset = JoystickButton.Button9;
-                mapping.ButtonPreviousImage2 = JoystickButton.Button10;
-                mapping.ButtonNextImage2 = JoystickButton.Button11;
-
-                mapping.AxisX = 0;
-                mapping.AxisY = 1;
-                mapping.AxisRotation = 2;
-                mapping.AxisImageSpeed = 3;
-                mapping.AxisP = 4;
-                mapping.AxisQ = 5;
-
-                return mapping;
-            }
+        private JoystickMapping() {
         }
 
         public static JoystickMapping WindowsMapping {
             get {
                 JoystickMapping mapping = new JoystickMapping();
-                mapping.ButtonBrake = JoystickButton.Button0;
-                mapping.ButtonLimitRotation = JoystickButton.Button1;
-                mapping.ButtonPreviousImage = JoystickButton.Button2;
-                mapping.ButtonNextImage = JoystickButton.Button3;
-                mapping.ButtonInvert = JoystickButton.Button4;
-                mapping.ButtonRandomize = JoystickButton.Button5;
-                mapping.ButtonAutoMove = JoystickButton.Button6;
-                mapping.ButtonAutoRandomize = JoystickButton.Button7;
-                mapping.ButtonRecenter = JoystickButton.Button8;
-                mapping.ButtonReset = JoystickButton.Button9;
-                mapping.ButtonPreviousImage2 = JoystickButton.Button10;
-                mapping.ButtonNextImage2 = JoystickButton.Button11;
+                mapping.ButtonDecrement = new[] { JoystickButton.Button0, JoystickButton.Button4, JoystickButton.Button8 };
+                mapping.ButtonIncrement = new[] { JoystickButton.Button1, JoystickButton.Button5, JoystickButton.Button9 };
+                mapping.ButtonReset = new[] { JoystickButton.Button2, JoystickButton.Button6, JoystickButton.Button10 };
+                mapping.ButtonMode = new[] { JoystickButton.Button3, JoystickButton.Button7, JoystickButton.Button11 };
 
-                mapping.AxisX = 0;
-                mapping.AxisY = 1;
-                mapping.AxisRotation = 3;
-                mapping.AxisImageSpeed = 2;
-                mapping.AxisP = 4;
-                mapping.AxisQ = 5;
+
+                mapping.AxisMap = new[] { 0, 1, 2, 3, 4, 5 };
 
                 return mapping;
             }
-        }    
+        }
 
-	}           
-}                                                     
+    }
+}

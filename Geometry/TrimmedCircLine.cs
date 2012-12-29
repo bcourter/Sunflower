@@ -5,7 +5,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 
-namespace Poincare.Geometry {	
+namespace Sunflower.Geometry {	
 	// TBD currently not efficient
 	public class TrimmedCircLine {
 		CircLine circLine;

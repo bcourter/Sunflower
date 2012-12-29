@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Poincare.Geometry {	
+namespace Sunflower.Geometry {	
 	public class Interval {
 		double start, end;
 		

@@ -7,7 +7,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 
-namespace Poincare.Geometry {
+namespace Sunflower.Geometry {
 	public class Circle : CircLine {
 		public Circle(double a, Complex b, double c)
 			: base(1, b / a, c / a) {

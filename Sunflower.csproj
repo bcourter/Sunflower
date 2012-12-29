@@ -7,7 +7,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{158E6F88-3D71-45D7-8F40-EA898EA38C22}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Poincare</RootNamespace>
+    <RootNamespace>Sunflower</RootNamespace>
     <AssemblyName>Poincare</AssemblyName>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -59,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Geometry\Interpolation.cs" />
     <Compile Include="JoystickControl.cs" />
     <Compile Include="KeyboardControl.cs" />
     <Compile Include="MouseControl.cs" />

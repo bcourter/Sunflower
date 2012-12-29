@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics;
 using OpenTK;
 
-namespace Poincare.Geometry {	
+namespace Sunflower.Geometry {	
 	public struct Mobius {
 		public readonly Complex A, B, C, D;
 

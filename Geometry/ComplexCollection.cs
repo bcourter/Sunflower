@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using OpenTK;
 
-namespace Poincare.Geometry {	
+namespace Sunflower.Geometry {	
 	public struct ComplexCollection {
 		int sectorCount;
 		SortedList<int, List<Complex>>[] sectors;

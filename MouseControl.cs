@@ -5,9 +5,9 @@ using System.Collections.Generic;
 //using System.Linq;
 using OpenTK;
 using OpenTK.Input;
-using Poincare.Geometry;
+using Sunflower.Geometry;
 
-namespace Poincare.Application {
+namespace Sunflower.Application {
 	public class MouseControl {
 		bool isDragging;
 		bool isDraggingAngle;

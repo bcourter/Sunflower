@@ -1,6 +1,6 @@
 using System;
 
-namespace Poincare.Geometry {
+namespace Sunflower.Geometry {
 	public static class Extensions {
 		public static Complex[] Conjugate(this Complex[] z) {
 			Complex[] result = new Complex[z.Length];
