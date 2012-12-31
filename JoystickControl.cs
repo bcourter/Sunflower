@@ -48,7 +48,7 @@ namespace Sunflower.Application {
             }
 
             if (mapping.ButtonMode.Contains(e.Button))
-                SunflowerWindow.Actors[mapping.ButtonMode.ToList().IndexOf(e.Button)].IsSorted = !SunflowerWindow.Actors[mapping.ButtonMode.ToList().IndexOf(e.Button)].IsSorted;
+                SunflowerWindow.Actors[mapping.ButtonMode.ToList().IndexOf(e.Button)].IsSorted = true;
 
             //if (mapping.ButtonReset.Contains(e.Button))
             //    SunflowerWindow.Reset();
@@ -61,6 +61,10 @@ namespace Sunflower.Application {
 
             if (mapping.ButtonIncrement.Contains(e.Button))
                 buttonIsDown[mapping.ButtonIncrement.ToList().IndexOf(e.Button)] = 0;
+
+            if (mapping.ButtonMode.Contains(e.Button))
+                SunflowerWindow.Actors[mapping.ButtonMode.ToList().IndexOf(e.Button)].IsSorted = false;
+
         }
 
         bool[] wasLastInReverse = new[] { false, false, false };

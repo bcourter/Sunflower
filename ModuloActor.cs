@@ -78,7 +78,7 @@ namespace Sunflower.Application {
         }
 
         public void Update(double elapsed) {
-            Time += elapsed * Speed;
+            Time += elapsed * Speed * modulo / 50;
             Console.WriteLine(Time.ToString());
         }
 
