@@ -169,7 +169,7 @@ namespace Sunflower.Application {
             double thetaOffset = Tau / 4;
             for (int i = 0; i < seeds + extraSeeds; i++) {
                 double theta = (double)(i + 1) * Tau / Phi;
-                double r = Math.Sqrt(i);
+                double r = Math.Sqrt(i+1);
                 double x = (r) * Math.Cos(theta + thetaOffset);
                 double y = (r) * Math.Sin(theta + thetaOffset);
 
